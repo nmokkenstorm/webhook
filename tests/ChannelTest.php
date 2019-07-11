@@ -13,6 +13,8 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Webhook\WebhookChannel;
 use NotificationChannels\Webhook\WebhookMessage;
+use NotificationChannels\Webhook\Clients\BaseHttpClient;
+use NotificationChannels\Webhook\Concerns\MapsWebhookClients;
 use NotificationChannels\Webhook\Exceptions\CouldNotSendNotification;
 
 class ChannelTest extends TestCase
@@ -20,18 +22,21 @@ class ChannelTest extends TestCase
     /** @test */
     public function it_can_send_a_notification()
     {
-        $client = $this->createTestClient(200);
-        $channel = new WebhookChannel($client);
-        $channel->send(new TestNotifiable(), new TestNotification());
+        $notifiable = new TestNotifiable();
+        $notification = new TestNotification();
+
+        $this->createTestChannel(200, $notifiable, $notification)
+             ->send($notifiable, $notification);
     }
 
     /** @test */
     public function it_can_send_a_notification_with_2xx_status()
     {
-        $client = $this->createTestClient(201);
+        $notifiable = new TestNotifiable();
+        $notification = new TestNotification();
 
-        $channel = new WebhookChannel($client);
-        $channel->send(new TestNotifiable(), new TestNotification());
+        $this->createTestChannel(201, $notifiable, $notification)
+             ->send($notifiable, $notification);
     }
 
     /**
@@ -51,16 +56,20 @@ class ChannelTest extends TestCase
         $handler = HandlerStack::create($mock);
         $client = new Client(['handler' => $handler]);
 
-        $channel = new WebhookChannel($client);
-        $channel->send(new TestNotifiable(), new TestNotification());
+        $notifiable = new TestNotifiable();
+        $notification = new TestNotification();
+
+        $this->createTestChannel(200, $notifiable, $notification, $client)
+             ->send($notifiable, $notification);
+
     }
 
     /**
      * @param int
      */
-    private function createTestClient(int $statusCode = 200)
+    private function createTestChannel(int $statusCode = 200, $notifiable, $notification, $guzzle = NULL)
     {
-        $response = new Response(201);
+        $response = new Response($statusCode);
 
         $testPayload = [
             'body' => '{"payload":{"webhook":"data"}}',
@@ -70,13 +79,21 @@ class ChannelTest extends TestCase
             ],
         ];
 
-        $client = Mockery::mock(ClientInterface::class);
-        $client->shouldReceive('post')
-            ->once()
-            ->with('https://notifiable-webhook-url.com', $testPayload)
-            ->andReturn($response);
+        if (!$guzzle) {
+            $guzzle = Mockery::mock(ClientInterface::class);
+            $guzzle->shouldReceive('post')
+                ->once()
+                ->with('https://notifiable-webhook-url.com', $testPayload)
+                ->andReturn($response);
+        }
+        
+        $mapper = Mockery::mock(MapsWebhookClients::class);
+        $mapper->shouldReceive('getClient')
+               ->once()
+               ->with($notifiable, $notification, 'https://notifiable-webhook-url.com')
+               ->andReturn(new BaseHttpClient($guzzle));
 
-        return $client;
+        return new WebhookChannel($mapper);
     }
 }
 
@@ -85,11 +102,11 @@ class TestNotifiable
     use \Illuminate\Notifications\Notifiable;
 
     /**
-     * @return int
+     * @return string
      */
     public function routeNotificationForWebhook()
     {
-        return 'https://notifiable-webhook-url.com';
+        return [ 'https://notifiable-webhook-url.com' ];
     }
 }
 

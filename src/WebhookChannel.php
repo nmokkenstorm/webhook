@@ -3,24 +3,23 @@
 namespace NotificationChannels\Webhook;
 
 use Illuminate\Support\Arr;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Webhook\Exceptions\CouldNotSendNotification;
+
+use NotificationChannels\Webhook\Concerns\MapsWebhookClients;
 
 class WebhookChannel
 {
     /**
-     * @var GuzzleHttp\ClientInterface
+     * @var \NotificationChannels\Webhook\MapsWebhookClients
      */
-    protected $client;
+    private $clientMapper;
 
     /**
-     * @param GuzzleHttp\ClientInterface
+     * @param \NotificationChannels\Webhook\MapsWebhookClients $clientMapper
      */
-    public function __construct(ClientInterface $client)
+    public function __construct(MapsWebhookClients $clientMapper)
     {
-        $this->client = $client;
+        $this->clientMapper = $clientMapper;
     }
 
     /**
@@ -35,34 +34,13 @@ class WebhookChannel
     public function send($notifiable, Notification $notification)
     {
         foreach ($this->getUrlsForNotifiable($notifiable) as $url) {
-            $this->sendWebhookNotification($notifiable, $notification, $url);
+
+            $this->clientMapper
+                 ->getClient($notifiable, $notification, $url)
+                 ->send($notifiable, $notification, $url);
+        
         }
-    }
-
-    /**
-     * Send the notification to a single webhook.
-     *
-     * @param mixed $notifiable
-     * @param \Illuminate\Notifications\Notification $notification
-     * @return void
-     *
-     * @throws \NotificationChannels\Webhook\Exceptions\CouldNotSendNotification
-     */
-    protected function sendWebhookNotification($notifiable, Notification $notification, string $url)
-    {
-        $webhookData = $notification->toWebhook($notifiable)->toArray();
-
-        [ 'data' => $data, 'headers' => $headers ] = $webhookData;
-
-        try {
-            $response = $this->client->post($url, [
-                'body'      => json_encode($data),
-                'headers'   => $headers,
-            ]);
-        } catch (RequestException $exception) {
-            throw CouldNotSendNotification::serviceRespondedWithAnError($exception->getResponse());
-        }
-    }
+    } 
 
     /**
      * @param mixed $notifiable

@@ -8,6 +8,11 @@
             "name": "Marcel Pociot",
             "email": "m.pociot@gmail.com",
             "homepage": "http://www.marcelpociot.com"
+        },
+        {
+            "name": "Niels Mokkenstorm",
+            "email": "niels@sustainabil.it",
+            "homepage": "https://www.sustainabil.it"
         }
     ],
     "require": {
@@ -39,7 +44,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "NotificationChannels\\Webhook\\Providers\\ServiceProvider"
+                "NotificationChannels\\Webhook\\ServiceProvider"
             ]
         }
     }

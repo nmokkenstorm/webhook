@@ -1,14 +1,33 @@
 <?php
 
-namespace NotificationChannels\Webhook\Providers;
+namespace NotificationChannels\Webhook;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use NotificationChannels\Webhook\WebhookChannel;
+
 use Illuminate\Support\ServiceProvider as BaseProvider;
+
+use NotificationChannels\Webhook\BaseHTTPClient;
+
 
 class ServiceProvider extends Baseprovider
 {
+    /**
+     * All of the container bindings that should be registered.
+     *
+     * @var array
+     */
+    public $bindings = [];
+
+    /**
+     * All of the container singletons that should be registered.
+     *
+     * @var array
+     */
+    public $singletons = [
+        Concerns\MapsWebhookClients::class => WebhookClientMapper::class
+    ];
+
     /**
      * Bootstrap any application services.
      *
@@ -33,8 +52,8 @@ class ServiceProvider extends Baseprovider
     public function register()
     {
         $this->app
-            ->when(WebhookChannel::class)
-            ->needs(ClientInterface::class)
+            ->when(BaseHTTPClient::class)
+            ->needs(ClientInterface)
             ->give(function ($app) {
                 return new Client($app['config.webhook-notifications']['default-config']);
             });
