@@ -10,7 +10,7 @@ class CouldNotSendNotification extends Exception
     /**
      * @const string
      */
-    private const ERROR_STRING = 'Webhook responded with an error: %s';
+    const ERROR_STRING = 'Webhook responded with an error: %s';
 
     /**
      * @param Psr\Http\Message\ResponseInterface $response

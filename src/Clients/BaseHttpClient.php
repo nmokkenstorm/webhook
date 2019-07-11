@@ -4,6 +4,8 @@ namespace NotificationChannels\Webhook\Clients;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
+
+use Illuminate\Support\Arr;
 use Illuminate\Notifications\Notification;
 
 use NotificationChannels\Webhook\Concerns\SendsWebhookNotifications;
@@ -38,12 +40,10 @@ class BaseHttpClient implements SendsWebhookNotifications
     {
         $webhookData = $notification->toWebhook($notifiable)->toArray();
 
-        [ 'data' => $data, 'headers' => $headers ] = $webhookData;
-
         try {
             $response = $this->client->post($url, [
-                'body'      => json_encode($data),
-                'headers'   => $headers,
+                'body'      => json_encode(Arr::get($webhookData, 'data', [])),
+                'headers'   => Arr::get($webhookData, 'headers', []),
             ]);
         } catch (RequestException $exception) {
             throw CouldNotSendNotification::serviceRespondedWithAnError($exception->getResponse());
