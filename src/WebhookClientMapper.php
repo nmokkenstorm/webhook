@@ -2,7 +2,8 @@
 
 namespace NotificationChannels\Webhook;
 
-use Illuminate\Contracts\Container;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Notifications\Notification;
 
 use NotificationChannels\Webhook\Concerns\MapsWebhookClients;
 use NotificationChannels\Webhook\Concerns\ResolvesWebhookClients;
@@ -47,7 +48,11 @@ class WebhookClientMapper implements MapsWebhookClients
      */
     public function getClient(string $url, $notifiable, Notification $notification) : SendsWebhookNotifications
     {
-        return $this->container->make($this->consolidator->consolidate($this->resolveClients()));
+        return $this->container->make(
+            $this->consolidator->consolidateClients(
+                $this->resolveClients($url, $notifiable, $notification)
+            )[0]
+        );
     }
 
     /**
@@ -61,7 +66,7 @@ class WebhookClientMapper implements MapsWebhookClients
     {
         $mapper = function (ResolvesWebhookClient $resolver) use ($url, $notifiable, $notification) : ? string {
             return $resolver->getClassName($url, $notificatiable, $notification);
-        }
+        };
 
         return array_filter(array_map($mapper, $this->resolvers));
     }

@@ -5,7 +5,7 @@ namespace NotificationChannels\Webhook\Consolidators;
 use NotificationChannels\Webhook\Clients\BaseHttpClient;
 use NotificationChannels\Webhook\Concerns\ConsolidatesWebhookClients;
 
-class BaseHttpConsolidator implements ConsolidatesWebhookClients;
+class BaseHttpConsolidator implements ConsolidatesWebhookClients
 {
     /**
      * @param array $clients

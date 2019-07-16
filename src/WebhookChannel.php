@@ -36,7 +36,7 @@ class WebhookChannel
         foreach ($this->getUrlsForNotifiable($notifiable) as $url) {
 
             $this->clientMapper
-                 ->getClient($notifiable, $notification, $url)
+                 ->getClient($url, $notifiable, $notification)
                  ->send($notifiable, $notification, $url);
         
         }

@@ -9,9 +9,10 @@ interface MapsWebhookClients
     /**
      * Resolve a client to send notifications with
      *
+     * @param string $url
      * @param mixed $notifiable
      * @param \Illuminate\Notifications\Notification $notification
-     * @param string $url
+     * @return \NotificationChannels\Webhook\Concerns\SendsWebhookNotifications
      */
-    public function getClient($notifiable, Notification $notification, string $url) : SendsWebhookNotifications;
+    public function getClient(string $url, $notifiable, Notification $notification) : SendsWebhookNotifications;
 }

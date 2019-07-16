@@ -7,8 +7,8 @@ use GuzzleHttp\ClientInterface;
 
 use Illuminate\Support\ServiceProvider as BaseProvider;
 
-use NotificationChannels\Webhook\BaseHTTPClient;
-use NotificationChannels\Webhook\Concerns\BaseHttpConsolidator;
+use NotificationChannels\Webhook\Clients\BaseHttpClient;
+use NotificationChannels\Webhook\Consolidators\BaseHttpConsolidator;
 
 class ServiceProvider extends Baseprovider
 {
@@ -54,10 +54,10 @@ class ServiceProvider extends Baseprovider
     public function register()
     {
         $this->app
-            ->when(BaseHTTPClient::class)
+            ->when(BaseHttpClient::class)
             ->needs(ClientInterface::class)
             ->give(function ($app) {
-                return new Client($app['config.webhook-notifications']['default-config']);
+                return new Client(config('webhook-notifications.default-config'));
             });
     }
 }
