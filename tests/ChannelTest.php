@@ -89,7 +89,7 @@ class ChannelTest extends TestCase
         $mapper = Mockery::mock(MapsWebhookClients::class);
         $mapper->shouldReceive('getClient')
                ->once()
-               ->with($notifiable, $notification, 'https://notifiable-webhook-url.com')
+               ->with('https://notifiable-webhook-url.com', $notifiable, $notification)
                ->andReturn(new BaseHttpClient($guzzle));
 
         return new WebhookChannel($mapper);
