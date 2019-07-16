@@ -1,7 +1,7 @@
 {
     "name": "laravel-notification-channels/webhook",
     "description": "Webhook Notifications driver",
-    "homepage": "https://github.com/laravel-notification-channels/webhook",
+    "homepage": "https://github.com/nmokkenstorm/webhook",
     "license": "MIT",
     "authors": [
         {
@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
+        "php": ">= 7.1.3",
         "guzzlehttp/guzzle": "~6.0",
         "illuminate/notifications": "5.5.*|5.6.*|5.7.*|5.8.*",
         "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*"
@@ -36,7 +36,8 @@
         }
     },
     "scripts": {
-        "test": "docker build . -t webhook && docker run webhook"
+        "test": "vendor/bin/phpunit",
+        "test-ci": "docker build . -t webhook && docker run webhook"
     },
     "config": {
         "sort-packages": true

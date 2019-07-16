@@ -1,7 +1,6 @@
-FROM php:7.0
+FROM php:7.1.3
 
 RUN apt-get update && apt-get install -y git zip
-
 RUN docker-php-ext-install pdo pdo_mysql
 
 RUN yes | pecl install xdebug \
@@ -13,15 +12,16 @@ RUN curl --silent --show-error https://getcomposer.org/installer | php
 
 RUN mv composer.phar /usr/local/bin/composer
 
-RUN mkdir /package
+RUN composer global require hirak/prestissimo --no-plugins --no-scripts
 
 WORKDIR /package
 
-COPY composer.json /package/
+COPY composer.json .
 
+RUN composer update --prefer-lowest --no-autoloader --no-scripts
 RUN composer install --no-scripts --no-autoloader
 
-COPY . /package/
+COPY . ./
 
 RUN composer dump-autoload
 

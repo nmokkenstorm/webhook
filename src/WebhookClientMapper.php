@@ -32,7 +32,8 @@ class WebhookClientMapper implements MapsWebhookClients
      */
     public function __construct(ConsolidatesWebhookClients $consolidator, Container $container)
     {
-        $this->consolidator = $consolidator
+        $this->consolidator = $consolidator;
+        $this->container    = $container;
     }
 
     /**

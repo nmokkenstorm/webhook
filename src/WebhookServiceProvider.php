@@ -8,7 +8,7 @@ use GuzzleHttp\ClientInterface;
 use Illuminate\Support\ServiceProvider as BaseProvider;
 
 use NotificationChannels\Webhook\BaseHTTPClient;
-
+use NotificationChannels\Webhook\Concerns\BaseHttpConsolidator;
 
 class ServiceProvider extends Baseprovider
 {
@@ -17,7 +17,9 @@ class ServiceProvider extends Baseprovider
      *
      * @var array
      */
-    public $bindings = [];
+    public $bindings = [
+        Concerns\ConsolidatesWebhookClients::class  => BaseHttpConsolidator::class,
+    ];
 
     /**
      * All of the container singletons that should be registered.
@@ -25,7 +27,7 @@ class ServiceProvider extends Baseprovider
      * @var array
      */
     public $singletons = [
-        Concerns\MapsWebhookClients::class => WebhookClientMapper::class
+        Concerns\MapsWebhookClients::class          => WebhookClientMapper::class,
     ];
 
     /**

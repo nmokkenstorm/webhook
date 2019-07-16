@@ -61,13 +61,12 @@ class ChannelTest extends TestCase
 
         $this->createTestChannel(200, $notifiable, $notification, $client)
              ->send($notifiable, $notification);
-
     }
 
     /**
      * @param int
      */
-    private function createTestChannel(int $statusCode = 200, $notifiable, $notification, $guzzle = NULL)
+    private function createTestChannel(int $statusCode, $notifiable, $notification, $guzzle = NULL)
     {
         $response = new Response($statusCode);
 
